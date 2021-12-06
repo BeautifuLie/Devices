@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"program/handlers"
-	"program/joker"
+	"program/server"
 	"program/storage/mongostorage"
 	"syscall"
 	"time"
@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := joker.NewServer(mongoStorage)
+	server := server.NewServer(mongoStorage)
 
 	myRouter := handlers.HandleRequest(handlers.RetHandler(server))
 

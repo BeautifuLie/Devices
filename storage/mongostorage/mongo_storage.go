@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"program/model"
+
 	"strconv"
 	"time"
 
@@ -100,10 +101,9 @@ func (ms *MongoStorage) LastStartime() ([]model.Event, []string) {
 
 }
 
-func (ms *MongoStorage) EventsTime() []model.Event {
+func (ms *MongoStorage) EventsTime(t1, t2 time.Time) []model.Event {
 	var e []model.Event
-	t1 := time.Date(2021, time.December, 6, 8, 1, 0, 0, time.Local)
-	t2 := time.Date(2021, time.December, 6, 8, 2, 0, 0, time.Local)
+
 	r1 := primitive.NewDateTimeFromTime(t1)
 	r2 := primitive.NewDateTimeFromTime(t2)
 
@@ -140,11 +140,9 @@ func (ms *MongoStorage) CloseClientDB() {
 }
 
 // {"$or":[
-// 	{endDate:{"$gte":t1,"$lte":t2 }},
-// 	{startDate:{"$gte":t1,"$lte":t2 }},
-// ]}
-
-// {"$or":[
 // 	{endDate:{"$gte":ISODate("2021-12-06T06:01:00+00:00"),"$lte":ISODate("2021-12-06T06:02:00+00:00") }},
 // 	{startDate:{"$gte":ISODate("2021-12-06T06:01:00+00:00"),"$lte":ISODate("2021-12-06T06:02:00+00:00") }},
+// 	{"$and":[
+// 		{startDate:{"$lte":ISODate("2021-12-06T06:01:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T06:02:00+00:00")}}
+// 	]},
 // ]}

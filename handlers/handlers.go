@@ -5,16 +5,16 @@ import (
 	"fmt"
 
 	"net/http"
-	"program/joker"
+	"program/server"
 
 	"github.com/gorilla/mux"
 )
 
 type apiHandler struct {
-	Server *joker.Server
+	Server *server.Server
 }
 
-func RetHandler(server *joker.Server) *apiHandler {
+func RetHandler(server *server.Server) *apiHandler {
 	return &apiHandler{
 		Server: server,
 	}
@@ -23,13 +23,13 @@ func RetHandler(server *joker.Server) *apiHandler {
 func HandleRequest(h *apiHandler) *mux.Router {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
-	myRouter.HandleFunc("/last", h.Last)
-	myRouter.HandleFunc("/time", h.EventsT)
+	myRouter.HandleFunc("/last", h.LastTenEvents)
+	myRouter.HandleFunc("/time", h.EventsTime)
 
 	return myRouter
 }
 
-func (h *apiHandler) Last(w http.ResponseWriter, r *http.Request) {
+func (h *apiHandler) LastTenEvents(w http.ResponseWriter, r *http.Request) {
 
 	res, str, err := h.Server.Last()
 
@@ -49,7 +49,7 @@ func (h *apiHandler) Last(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *apiHandler) EventsT(w http.ResponseWriter, r *http.Request) {
+func (h *apiHandler) EventsTime(w http.ResponseWriter, r *http.Request) {
 
 	res := h.Server.EventsByTime()
 

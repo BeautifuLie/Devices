@@ -31,7 +31,7 @@ func HandleRequest(h *apiHandler) *mux.Router {
 
 func (h *apiHandler) Last(w http.ResponseWriter, r *http.Request) {
 
-	_, str, err := h.Server.Last()
+	res, str, err := h.Server.Last()
 
 	if err != nil {
 		fmt.Println("err")
@@ -43,6 +43,10 @@ func (h *apiHandler) Last(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *apiHandler) EventsT(w http.ResponseWriter, r *http.Request) {
@@ -50,8 +54,11 @@ func (h *apiHandler) EventsT(w http.ResponseWriter, r *http.Request) {
 	res := h.Server.EventsByTime()
 
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(res)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+
+	e, _ := json.MarshalIndent(res, "/", "   ")
+	// err := json.NewEncoder(w).Encode(e)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// }
+	w.Write(e)
 }

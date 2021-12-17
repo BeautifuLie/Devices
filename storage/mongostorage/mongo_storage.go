@@ -64,7 +64,7 @@ func (ms *MongoStorage) Insert() {
 
 	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 
-	t := time.Date(2021, time.December, 6, 8, 0, 0, 0, time.UTC)
+	t := time.Date(2021, time.December, 6, 0, 0, 0, 0, time.UTC)
 	rand.Seed(time.Now().Unix())
 	// limit := 300000
 	limit := 86400
@@ -121,11 +121,11 @@ func (ms *MongoStorage) LastStartime(n int64) ([]model.Event, []string) {
 
 func (ms *MongoStorage) EventsTime(t1, t2 time.Time) []model.Event {
 	var e []model.Event
-
+	// opts := options.Find().SetProjection(bson.D{{"endDate", 0}, {"startDate", 0}, {"_id", 0}})
 	filter := bson.D{
 		{"$or", bson.A{
 			bson.D{{"endDate", bson.D{{"$gte", t1}, {"$lte", t2}}}},
-			bson.D{{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$exists", false}}}},
+			bson.D{{"startDate", bson.D{{"$lte", t1}}}, {"endDate", bson.D{{"$gte", t2}}}},
 		}},
 	}
 
@@ -165,9 +165,19 @@ func (ms *MongoStorage) CloseClientDB() {
 // {"$or":[
 // 	{endDate:{"$gte":ISODate("2021-12-06T06:01:00+00:00"),"$lte":ISODate("2021-12-06T06:02:00+00:00") }},
 // {startDate:{"$lte":ISODate("2021-12-06T06:01:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T06:02:00+00:00")}},
+//]}
 
-// ]}
 // {"$or":[
 // 	{endDate:{"$gte":ISODate("2021-12-06T08:01:00+00:00"),"$lte":ISODate("2021-12-06T08:02:00+00:00") }},
 // 	{startDate:{"$lte":ISODate("2021-12-06T08:02:00+00:00")},endDate:{"$exists":false}},
+// ]}
+
+// {"$or":[
+// 	{endDate:{"$gte":ISODate("2021-12-06T08:01:00+00:00"),"$lte":ISODate("2021-12-06T08:02:00+00:00") }},
+// 	{startDate:{"$lte":ISODate("2021-12-06T08:02:00+00:00")}},
+// ]}
+
+// {"$or":[
+// 	{endDate:{"$gte":ISODate("2021-12-06T08:00:00+00:00"),"$lte":ISODate("2021-12-06T08:00:05+00:00") }},
+// 	{startDate:{"$lte":ISODate("2021-12-06T08:00:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T08:00:05+00:00")}},
 // ]}

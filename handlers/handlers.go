@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"net/http"
 	"program/server"
@@ -62,13 +63,15 @@ func (h *apiHandler) EventsTime(w http.ResponseWriter, r *http.Request) {
 	end := r.FormValue("end")
 
 	res := h.Server.EventsByTime(start, end)
-
+	l := len(res)
+	j := strconv.Itoa(l)
+	str := j + " events found"
 	w.Header().Set("Content-Type", "application/json")
 
 	e, _ := json.MarshalIndent(res, "/", "   ")
-	// err := json.NewEncoder(w).Encode(e)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// }
+	err := json.NewEncoder(w).Encode(str)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	w.Write(e)
 }

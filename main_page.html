@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JokesApp</title>
+
+</head>
+
+<body>
+    <h3>Events</h3>
+
+    <form action="/last" method="GET">
+        <input type="text" name="limit" placeholder="limit" /> last events<br />
+        <input type="submit" value="Get" />
+    </form>
+    <br>
+    <br>
+    <br>
+
+
+
+
+
+    <form action="/time" method="GET">
+
+        start: <input type="time" step="1" name="start" min="08:00" max="18:00" required
+            placeholder="start time" /><br />
+        end : <input type="time" step="1" name="end" min="08:00" max="18:00" required placeholder="end time" /><br />
+        <br>
+        <input type="submit" value="Get by time" />
+    </form>
+
+
+
+
+
+</body>
+
+</html>

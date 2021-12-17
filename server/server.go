@@ -1,8 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"program/model"
 	"program/storage"
+	"strconv"
 	"time"
 )
 
@@ -18,17 +20,28 @@ func NewServer(storage storage.Storage) *Server {
 	return s
 }
 
-func (s *Server) Last() ([]model.Event, []string, error) {
-
-	result, str := s.storage.LastStartime()
+func (s *Server) Last(l string) ([]model.Event, []string, error) {
+	a, _ := strconv.Atoi(l)
+	n := int64(a)
+	result, str := s.storage.LastStartime(n)
 
 	return result, str, nil
 }
 
-func (s *Server) EventsByTime() []model.Event {
-	t1 := time.Date(2021, time.December, 6, 8, 1, 0, 0, time.Local)
-	t2 := time.Date(2021, time.December, 6, 8, 2, 0, 0, time.Local)
-	res := s.storage.EventsTime(t1, t2)
+func (s *Server) EventsByTime(start, end string) []model.Event {
+	startString := string("2021-12-06 " + start)
+	startTime, err := time.Parse("2006-01-02 15:04:05", startString)
+	if err != nil {
+		fmt.Errorf("startTime parsing %w", err)
+	}
+
+	endString := string("2021-12-06 " + end)
+	endTime, err := time.Parse("2006-01-02 15:04:05", endString)
+	if err != nil {
+		fmt.Errorf("startTime parsing %w", err)
+	}
+
+	res := s.storage.EventsTime(startTime, endTime)
 	return res
 
 }

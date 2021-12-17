@@ -64,22 +64,23 @@ func (ms *MongoStorage) Insert() {
 
 	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 
-	t := time.Date(2021, time.December, 6, 8, 0, 0, 0, time.Local)
+	t := time.Date(2021, time.December, 6, 8, 0, 0, 0, time.UTC)
 	rand.Seed(time.Now().Unix())
-	limit := 300000
+	// limit := 300000
+	limit := 86400
 
 	ids := "ABCDEFGHIJ"
 
 	for i := 0; i < 200000; i++ {
 
 		randomStart := rand.Intn(limit)
-		startTime := t.Add(time.Millisecond * time.Duration(randomStart))
+		startTime := t.Add(time.Second * time.Duration(randomStart))
 
 		startToString := startTime.String()
 		startToInt, _ := strconv.Atoi(startToString)
 
 		randomEndTime := rand.Intn(limit-startToInt) + randomStart
-		endTime := t.Add(time.Millisecond * time.Duration(randomEndTime))
+		endTime := t.Add(time.Second * time.Duration(randomEndTime))
 
 		randomID := rand.Intn(len(ids))
 		id := ids[randomID]
@@ -97,12 +98,12 @@ func (ms *MongoStorage) Insert() {
 
 }
 
-func (ms *MongoStorage) LastStartime() ([]model.Event, []string) {
+func (ms *MongoStorage) LastStartime(n int64) ([]model.Event, []string) {
 	var e []model.Event
 	//.SetProjection(bson.D{{"endDate", 0}, {"startDate", 0}, {"_id", 0}})
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "startDate", Value: -1}})
-	opts.SetLimit(10)
+	opts.SetLimit(n)
 	cursor, err := ms.collection.Find(context.TODO(), bson.D{}, opts)
 	if err != nil {
 		panic(err)
@@ -121,13 +122,10 @@ func (ms *MongoStorage) LastStartime() ([]model.Event, []string) {
 func (ms *MongoStorage) EventsTime(t1, t2 time.Time) []model.Event {
 	var e []model.Event
 
-	r1 := primitive.NewDateTimeFromTime(t1)
-	r2 := primitive.NewDateTimeFromTime(t2)
-
 	filter := bson.D{
 		{"$or", bson.A{
-			bson.D{{"endDate", bson.D{{"$gte", r1}, {"$lte", r2}}}},
-			bson.D{{"startDate", bson.D{{"$lte", r2}}}, {"endDate", bson.D{{"$exists", false}}}},
+			bson.D{{"endDate", bson.D{{"$gte", t1}, {"$lte", t2}}}},
+			bson.D{{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$exists", false}}}},
 		}},
 	}
 
@@ -170,6 +168,6 @@ func (ms *MongoStorage) CloseClientDB() {
 
 // ]}
 // {"$or":[
-// 	{endDate:{"$gte":ISODate("2021-12-06T06:01:00+00:00"),"$lte":ISODate("2021-12-06T06:02:00+00:00") }},
-// 	{startDate:{"$lte":ISODate("2021-12-06T06:02:00+00:00")},endDate:{"$exists":false}},
+// 	{endDate:{"$gte":ISODate("2021-12-06T08:01:00+00:00"),"$lte":ISODate("2021-12-06T08:02:00+00:00") }},
+// 	{startDate:{"$lte":ISODate("2021-12-06T08:02:00+00:00")},endDate:{"$exists":false}},
 // ]}

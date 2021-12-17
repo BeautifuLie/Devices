@@ -23,15 +23,21 @@ func RetHandler(server *server.Server) *apiHandler {
 func HandleRequest(h *apiHandler) *mux.Router {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
+	myRouter.HandleFunc("/", h.homePage).Methods(http.MethodGet)
 	myRouter.HandleFunc("/last", h.LastTenEvents)
 	myRouter.HandleFunc("/time", h.EventsTime)
 
 	return myRouter
 }
-
+func (h *apiHandler) homePage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "main_page.html")
+}
 func (h *apiHandler) LastTenEvents(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 
-	res, str, err := h.Server.Last()
+	limit := r.FormValue("limit")
+
+	res, str, err := h.Server.Last(limit)
 
 	if err != nil {
 		fmt.Println("err")
@@ -50,8 +56,12 @@ func (h *apiHandler) LastTenEvents(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *apiHandler) EventsTime(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 
-	res := h.Server.EventsByTime()
+	start := r.FormValue("start")
+	end := r.FormValue("end")
+
+	res := h.Server.EventsByTime(start, end)
 
 	w.Header().Set("Content-Type", "application/json")
 

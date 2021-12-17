@@ -6,7 +6,7 @@ import (
 )
 
 type Storage interface {
-	LastStartime() ([]model.Event, []string)
+	LastStartime(n int64) ([]model.Event, []string)
 	EventsTime(t1, t2 time.Time) []model.Event
 	Insert()
 	CloseClientDB()

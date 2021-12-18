@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"program/model"
 
-	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,19 +40,14 @@ func NewMongoStorage(connectURI string) (*MongoStorage, error) {
 		collection: db.Collection("Events"),
 	}
 
-	model := []mongo.IndexModel{
-		// {
-		// 	Keys: bson.D{
-		// 		{Key: "endDate", Value: 1},
-		// 		{Key: "startDate", Value: 1},
-		// 	}},
+	model := mongo.IndexModel{
 
-		{
-			Keys: bson.D{
-				{Key: "endDate", Value: 1}},
+		Keys: bson.D{
+			{Key: "endDate", Value: 1},
+			{Key: "startDate", Value: 1},
 		},
 	}
-	_, err = ms.collection.Indexes().CreateMany(context.TODO(), model)
+	_, err = ms.collection.Indexes().CreateOne(context.TODO(), model)
 	if err != nil {
 		panic(err)
 	}
@@ -76,10 +70,7 @@ func (ms *MongoStorage) Insert() {
 		randomStart := rand.Intn(limit)
 		startTime := t.Add(time.Second * time.Duration(randomStart))
 
-		startToString := startTime.String()
-		startToInt, _ := strconv.Atoi(startToString)
-
-		randomEndTime := rand.Intn(limit-startToInt) + randomStart
+		randomEndTime := rand.Intn(limit-randomStart) + randomStart
 		endTime := t.Add(time.Second * time.Duration(randomEndTime))
 
 		randomID := rand.Intn(len(ids))
@@ -125,7 +116,7 @@ func (ms *MongoStorage) EventsTime(t1, t2 time.Time) []model.Event {
 	filter := bson.D{
 		{"$or", bson.A{
 			bson.D{{"endDate", bson.D{{"$gte", t1}, {"$lte", t2}}}},
-			bson.D{{"startDate", bson.D{{"$lte", t1}}}, {"endDate", bson.D{{"$gte", t2}}}},
+			bson.D{{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$gte", t2}}}},
 		}},
 	}
 
@@ -180,4 +171,9 @@ func (ms *MongoStorage) CloseClientDB() {
 // {"$or":[
 // 	{endDate:{"$gte":ISODate("2021-12-06T08:00:00+00:00"),"$lte":ISODate("2021-12-06T08:00:05+00:00") }},
 // 	{startDate:{"$lte":ISODate("2021-12-06T08:00:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T08:00:05+00:00")}},
+// ]}
+
+// {"$or":[
+// 	{endDate:{"$gte":ISODate("2021-12-06T18:00:00+00:00"),"$lte":ISODate("2021-12-06T21:00:00+00:00") }},
+// 	{startDate:{"$lte":ISODate("2021-12-06T21:00:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T21:00:00+00:00")}},
 // ]}

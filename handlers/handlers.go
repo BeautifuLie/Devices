@@ -62,14 +62,17 @@ func (h *apiHandler) EventsTime(w http.ResponseWriter, r *http.Request) {
 	start := r.FormValue("start")
 	end := r.FormValue("end")
 
-	res := h.Server.EventsByTime(start, end)
+	res, err := h.Server.EventsByTime(start, end)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	l := len(res)
 	j := strconv.Itoa(l)
 	str := j + " events found"
 	w.Header().Set("Content-Type", "application/json")
 
 	e, _ := json.MarshalIndent(res, "/", "   ")
-	err := json.NewEncoder(w).Encode(str)
+	err = json.NewEncoder(w).Encode(str)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

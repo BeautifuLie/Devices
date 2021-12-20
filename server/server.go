@@ -34,7 +34,7 @@ func (s *Server) Last(l string) ([]model.Event, []string, error) {
 	return result, str, nil
 }
 
-func (s *Server) EventsByTime(start, end string) ([]model.Event, error) {
+func (s *Server) EventsByTime(start, end, event string) ([]model.Event, error) {
 	startString := string("2021-12-06 " + start)
 	startTime, err := time.Parse("2006-01-02 15:04:05", startString)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *Server) EventsByTime(start, end string) ([]model.Event, error) {
 		return nil, fmt.Errorf("startTime parsing %w", err)
 	}
 
-	res := s.storage.EventsTime(startTime, endTime)
+	res := s.storage.EventsTime(startTime, endTime, event)
 	return res, nil
 
 }

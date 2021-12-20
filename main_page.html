@@ -24,9 +24,10 @@
 
     <form action="/time" method="GET">
 
-        start: <input type="time" step="1" name="start" min="08:00" max="18:00" required
-            placeholder="start time" /><br />
-        end : <input type="time" step="1" name="end" min="08:00" max="18:00" required placeholder="end time" /><br />
+        start: <input type="time" step="1" name="start" required placeholder="start time" /><br />
+        end : <input type="time" step="1" name="end" required placeholder="end time" /><br />
+        <br>
+        event : <input type="text" name="event" placeholder="event type" /><br />
         <br>
         <input type="submit" value="Get by time" />
     </form>

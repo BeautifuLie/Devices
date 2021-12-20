@@ -110,14 +110,21 @@ func (ms *MongoStorage) LastStartime(n int64) ([]model.Event, []string) {
 
 }
 
-func (ms *MongoStorage) EventsTime(t1, t2 time.Time) []model.Event {
+func (ms *MongoStorage) EventsTime(t1, t2 time.Time, event string) []model.Event {
 	var e []model.Event
-	// opts := options.Find().SetProjection(bson.D{{"endDate", 0}, {"startDate", 0}, {"_id", 0}})
-	filter := bson.D{
-		{"$or", bson.A{
-			bson.D{{"endDate", bson.D{{"$gte", t1}, {"$lte", t2}}}},
-			bson.D{{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$gte", t2}}}},
-		}},
+	var filter primitive.D
+	if event == "" {
+		filter = bson.D{
+
+			{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$gte", t1}}}}
+
+	} else {
+		filter = bson.D{
+			{"$and", bson.A{
+				bson.D{{"deviceId", event}},
+				bson.D{{"startDate", bson.D{{"$lte", t2}}}, {"endDate", bson.D{{"$gte", t1}}}},
+			}},
+		}
 	}
 
 	cursor, err := ms.collection.Find(context.TODO(), filter)
@@ -175,5 +182,11 @@ func (ms *MongoStorage) CloseClientDB() {
 
 // {"$or":[
 // 	{endDate:{"$gte":ISODate("2021-12-06T18:00:00+00:00"),"$lte":ISODate("2021-12-06T21:00:00+00:00") }},
-// 	{startDate:{"$lte":ISODate("2021-12-06T21:00:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T21:00:00+00:00")}},
+// 	{startDate:{"$lte":ISODate("2021-12-06T21:00:00+00:00")},endDate:{"$gte":ISODate("2021-12-06T18:00:00+00:00")}},
 // ]}
+
+// {
+// 	deviceId:"J",
+// 	startDate:{"$lte":ISODate("2021-12-06T21:00:00+00:00")},
+// 	endDate:{"$gte":ISODate("2021-12-06T20:59:00+00:00")}
+// }

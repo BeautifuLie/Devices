@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"net/http"
 	"program/server"
@@ -61,8 +62,9 @@ func (h *apiHandler) EventsTime(w http.ResponseWriter, r *http.Request) {
 
 	start := r.FormValue("start")
 	end := r.FormValue("end")
-
-	res, err := h.Server.EventsByTime(start, end)
+	eventQuery := r.FormValue("event")
+	event := strings.ToUpper(eventQuery)
+	res, err := h.Server.EventsByTime(start, end, event)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
